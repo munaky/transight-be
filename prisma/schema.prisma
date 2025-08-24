@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  image     String   @default("profile-default.png")
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cart     Cart[]
+  customer Customer?
+}
+
+model Customer {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  point     Int      @default(0)
+  address   String
+  phone     String
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  orders Order[]
+}
+
+model Product {
+  id        Int       @id @default(autoincrement())
+  name      String
+  price     Int
+  stock     Int
+  image     String    @default("product-default.png")
+  createAt  DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deleteAt  DateTime?
+
+  cart       Cart[]
+  orderItems OrderItem[]
+}
+
+model Cart {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  quantity  Int
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id              Int      @id @default(autoincrement())
+  customerId      Int?
+  receiverName    String
+  receiverAddress String
+  receiverPhone   String
+  createAt        DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  orderItems OrderItem[]
+}
+
+model OrderItem {
+  id               Int      @id @default(autoincrement())
+  orderId          Int
+  productId        Int
+  productName      String
+  productPrice     Int
+  quantity         Int
+  total            Int
+  createAt         DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
