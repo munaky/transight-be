@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "5cc12b74-dc84-4433-9529-615e1f0c67c4",
-		"name": "backend-mini-project",
+		"_postman_id": "6f1b22c1-fe41-458e-87a7-0bcdb018cd34",
+		"name": "transight",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "38784263"
 	},
@@ -29,7 +29,7 @@
 								},
 								{
 									"key": "password",
-									"value": "admin123",
+									"value": "admin12345",
 									"type": "text"
 								},
 								{
@@ -78,7 +78,7 @@
 								},
 								{
 									"key": "password",
-									"value": "user123",
+									"value": "user12345",
 									"type": "text"
 								},
 								{
@@ -123,7 +123,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"password\": \"user123\"\n}",
+							"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"password\": \"user12345\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -138,6 +138,31 @@
 							"path": [
 								"auth",
 								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get info",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"password\": \"user123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"get"
 							]
 						}
 					},
@@ -724,17 +749,17 @@
 									"formdata": [
 										{
 											"key": "name",
-											"value": "product3",
+											"value": "Lamp",
 											"type": "text"
 										},
 										{
 											"key": "price",
-											"value": "20000",
+											"value": "29000",
 											"type": "text"
 										},
 										{
 											"key": "stock",
-											"value": "43",
+											"value": "99999",
 											"type": "text"
 										},
 										{
@@ -1248,6 +1273,38 @@
 							"response": []
 						}
 					]
+				}
+			]
+		},
+		{
+			"name": "n8n",
+			"item": [
+				{
+					"name": "send email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"to\": \"010905mn@gmail.com\",\r\n    \"text\": \"test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/n8n/send-email",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"n8n",
+								"send-email"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}

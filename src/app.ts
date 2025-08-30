@@ -4,14 +4,13 @@ import express from 'express';
 import { cors } from './middlewares/cors';
 import { limiter } from './middlewares/rate-limiter';
 import { session } from './middlewares/session';
-import { isAuthenticated } from './middlewares/isAuthenticated';
-import { isAdmin } from './middlewares/isAdmin';
 import { errorHandler } from './middlewares/error-handler';
 
 /* Routes */
 import authRoutes from './routes/auth-routes';
 import userRoutes from './routes/user/index';
 import adminRoutes from './routes/admin/index';
+import n8nRoutes from './routes/n8n-routes'
 
 /* Global Variable */
 import {globals} from './globals'
@@ -27,6 +26,7 @@ app.use(session);
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
+app.use('/n8n', n8nRoutes);
 
 app.use(errorHandler);
 

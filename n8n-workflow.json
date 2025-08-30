@@ -1,0 +1,589 @@
+{
+  "name": "Transight Analysis",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1296,
+        336
+      ],
+      "id": "d822b0d4-31ff-4d13-a1e3-9f980f7ed8f6",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "function isoToDateTime(isoString) {\n  const date = new Date(isoString);\n  const day = date.getDate().toString().padStart(2, \"0\");\n  const month = (date.getMonth() + 1).toString().padStart(2, \"0\");\n  const year = date.getFullYear();\n  const hours = date.getHours().toString().padStart(2, \"0\");\n  const minutes = date.getMinutes().toString().padStart(2, \"0\");\n  return {\n    date: `${day}/${month}/${year}`,\n    time: `${hours}:${minutes}`\n  };\n}\n\nlet combined = \"Data Penjualan (7 Hari Terakhir):\\n\";\n\nfor (const item of $('Get Transactions').all()) {\n  const { date, time } = isoToDateTime(item.json.order_created_at);\n  const stringData = `- ${date}, ${time}, ${item.json.productName}, ${item.json.quantity} pcs, ${item.json.receiverAddress}`;\n  combined += stringData + \"\\n\";\n}\n\nreturn {\n  json: {\n    lastInsight: $('Get Last Insight').first().json.result || 'Tidak ada',\n    formattedTransactions: combined.trim()\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        336
+      ],
+      "id": "652e8073-3385-4c51-ae4d-cff7a455998b",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "text": "={{ $('Convert to HTML (Telegram)').first().json.content.parts[0].text }}",
+        "replyMarkup": "=",
+        "forceReply": {},
+        "replyKeyboardOptions": {},
+        "replyKeyboardRemove": {},
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        272
+      ],
+      "id": "9b05c646-2cb7-4242-950f-aab1ef37d231",
+      "name": "Send a text message",
+      "webhookId": "243c2162-84da-4d9d-8801-7c8386acf67a",
+      "credentials": {
+        "telegramApi": {
+          "id": "FVq27FHx7JzttA3k",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        352,
+        192
+      ],
+      "id": "7c69eeb5-2937-4992-bd1c-f13407c72385",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "56bd97b1-16b8-4638-8c02-7b3ae6222059",
+              "leftValue": "={{ $json.content.parts[0].text.length }}",
+              "rightValue": 4090,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        160,
+        448
+      ],
+      "id": "2f37a37c-3864-4c56-9d24-a7ee50f4f44f",
+      "name": "If length < 4090"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analisa Minggu Lalu:\n{{ $json.lastInsight }}\n\n{{ $json.formattedTransactions }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=Anda adalah seorang **Analis Data Profesional**. Tugas Anda adalah membandingkan performa penjualan minggu ini dengan minggu lalu berdasarkan 2 input yang diberikan oleh user:\n\n1. **Analisa Minggu Lalu** (berisi ringkasan, insight, dan strategi sebelumnya).\n2. **Data Penjualan 7 Hari Terakhir** (data mentah transaksi).\n\nLakukan analisis dengan langkah berikut:\n\n1. **Ringkasan Data Minggu Ini**\n\n   * Jenis barang yang terjual\n   * Jumlah penjualan per barang\n   * Waktu/jam transaksi paling sering terjadi\n   * Asal pesanan\n\n2. **Perbandingan dengan Minggu Lalu**\n\n   * Tren penjualan (naik/turun, barang populer baru, wilayah baru)\n   * Apakah strategi minggu lalu efektif atau tidak\n   * Perubahan pola transaksi\n\n3. **Insight Utama Minggu Ini**\n\n   * Soroti temuan baru atau kejutan dalam data\n\n4. **Rekomendasi Strategi Selanjutnya**\n\n   * Berikan strategi berdasarkan hasil analisa perbandingan minggu ini vs minggu lalu\n\n**Aturan Output:**\n\n* Jawaban harus **padat, to the point, tanpa basa-basi**.\n* Gunakan **emoji** agar lebih ekspresif.\n* Susun jawaban dengan format berikut:\n\n```\n📊 Ringkasan Penjualan Minggu Ini\n💹 Perbandingan dengan Minggu Lalu\n💡 Insight Utama\n🚀 Rekomendasi Strategi Selanjutnya\n```\n\n**Contoh Input dari User:**\n\n```\nAnalisa Minggu Lalu:\n📊 Ringkasan: Produk A dominan, jam sibuk sore hari, pesanan terbanyak dari Jakarta.\n💡 Insight: Permintaan tinggi untuk Produk A, potensi promosi sore hari.\n🚀 Rekomendasi: Fokuskan stok Produk A dan iklan di Jakarta jam sore.\n\nData Penjualan (7 Hari Terakhir):\n- 20-08-2025, 10:00, Produk A, 5 pcs, Jakarta\n- 20-08-2025, 14:00, Produk B, 2 pcs, Bandung\n- 21-08-2025, 20:00, Produk A, 3 pcs, Bogor\n...\n```"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        336
+      ],
+      "id": "4d50af9c-eb33-4c8b-bdfb-4e0914df786b",
+      "name": "Generate Insight",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6RDK2RyBTYRIw8wN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.content.parts[0].text }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=Ubah teks yang diberikan menjadi template email HTML profesional. Output wajib berupa kode HTML lengkap dengan <!DOCTYPE html>, <html>, <head>, dan <body>. Gunakan CSS inline agar kompatibel dengan klien email. Desain harus bersih, teknis, dan sesuai untuk administrator perusahaan. Jangan ubah format teks yang diberikan dan jangan hilangkan emoji. Output hanya boleh berupa tag HTML valid, tanpa tambahan simbol, markup, atau teks lain (misalnya ```html, **, dll.)."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        0,
+        176
+      ],
+      "id": "0db8d04a-315b-4e31-a354-aba615bd2bf4",
+      "name": "Convert to HTML",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6RDK2RyBTYRIw8wN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Convert to HTML (Telegram)').item.json.content.parts[0].text }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=Anda adalah **AI Profesional** yang menerima **MarkdownV2** hasil ringkasan analisis penjualan produk. Tugas Anda adalah memastikan output **tidak melebihi 4096 karakter**, tanpa merusak format MarkdownV2 Telegram, dan tetap mempertahankan inti informasi serta emoji.\n\n---\n\n### **Langkah-langkah:**\n\n1. Terima input berupa **MarkdownV2** ringkasan sebelumnya.\n2. Jika > 4096 karakter → ringkas lebih lanjut sampai ≤ 4096 karakter.\n3. **Ketentuan ringkasan lebih lanjut:**\n\n   * Pertahankan **emoji** di tempat penting.\n   * Fokus pada **intisari data, insight utama, dan rekomendasi strategi**.\n   * Hilangkan kalimat tambahan, penjelasan berulang, atau detail minor.\n   * Jangan ubah struktur MarkdownV2 (bold, list, heading, escape karakter).\n4. Tambahkan **footer** tetap di bagian akhir:\n\n   ```\n   Untuk melihat detail, check email terbaru Anda mengenai Transight Weekly Analysis Report 📧\n   ```\n\n---\n\n### **Output Akhir**\n\n* MarkdownV2 **≤ 4096 karakter**, siap dikirim ke Telegram.\n* Tidak ada basa-basi lain.\n* Ringkasan tetap jelas, profesional, dan ekspresif dengan emoji."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        416,
+        464
+      ],
+      "id": "c35af6ca-9af6-4d14-a5d4-b6fdd2d04a74",
+      "name": "Summarize",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6RDK2RyBTYRIw8wN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    o.id AS order_id,\n    o.\"receiverName\",\n    o.\"receiverAddress\",\n    o.\"receiverPhone\",\n    o.\"createAt\" AS order_created_at,\n    oi.id AS order_item_id,\n    oi.\"productId\",\n    oi.\"productName\",\n    oi.\"productPrice\",\n    oi.quantity,\n    oi.total\nFROM \"Order\" o\nJOIN \"OrderItem\" oi ON o.id = oi.\"orderId\"\nORDER BY o.id, oi.id;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1104,
+        416
+      ],
+      "id": "6614f0de-38c7-4871-956b-a4b7872e5cbb",
+      "name": "Get Transactions",
+      "credentials": {
+        "postgres": {
+          "id": "Kev0DJ42NsNcdqfI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "AnalysisResult",
+          "mode": "list",
+          "cachedResultName": "AnalysisResult"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "result": "={{ $json.content.parts[0].text }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "result",
+              "displayName": "result",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "createAt",
+              "displayName": "createAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2efd0436-14de-4967-9f6a-3e66ba1d1ee0",
+      "name": "Insert Insight",
+      "credentials": {
+        "postgres": {
+          "id": "Kev0DJ42NsNcdqfI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "AnalysisResult",
+          "mode": "list",
+          "cachedResultName": "AnalysisResult"
+        },
+        "limit": 1,
+        "sort": {
+          "values": [
+            {
+              "column": "createAt",
+              "direction": "DESC"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1104,
+        256
+      ],
+      "id": "ac2376b1-3bc7-461f-b47f-a51443b2b5ae",
+      "name": "Get Last Insight",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "Kev0DJ42NsNcdqfI",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -880,
+        336
+      ],
+      "id": "bbf00151-b55b-46d4-9a5f-0ff43df1aa04",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.content.parts[0].text }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=Ringkas teks masukan dengan gaya profesional, ringkas, dan teknis. Hasilkan output dalam format HTML yang didukung Telegram, hanya menggunakan tag <b>, <i>, <u>, dan <s>. Jangan gunakan Markdown, simbol markup, atau tag HTML lain. Pastikan emoji yang ada tetap dipertahankan. Di bagian akhir ringkasan, tambahkan kalimat: \"Untuk Detail Lebih Lanjut Silahkan Check Email Anda\". Jangan berikan penjelasan tambahan selain hasil ringkasan."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        448
+      ],
+      "id": "85b8d0ae-d83f-430f-b94f-3008de04ea90",
+      "name": "Convert to HTML (Telegram)",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6RDK2RyBTYRIw8wN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "Transight Analysis <transight@transight.com>",
+        "subject": "Transight Weekly Analysis Report",
+        "html": "={{ $('Convert to HTML').first().json.content.parts[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        576,
+        96
+      ],
+      "id": "649ebf04-5290-4d0a-894f-c5e3f4c97c11",
+      "name": "Send email",
+      "webhookId": "23a0d813-c478-4153-a446-07ab4884ef47",
+      "credentials": {
+        "smtp": {
+          "id": "7STO0GX9WoSrS57s",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "1. Setting PostgreSQL Connection\n2. Set Gemini API\n3. Set Telegram ChatId\n4. Set Email Credentials",
+        "height": 128,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -704,
+        512
+      ],
+      "typeVersion": 1,
+      "id": "37bffc9a-2a0a-4b1d-8710-99f2aa0e6dc4",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Transactions",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Last Insight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Generate Insight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If length < 4090": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Insight": {
+      "main": [
+        [
+          {
+            "node": "Convert to HTML",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Convert to HTML (Telegram)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insert Insight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to HTML": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "If length < 4090",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Transactions": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get Last Insight": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to HTML (Telegram)": {
+      "main": [
+        [
+          {
+            "node": "If length < 4090",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "522ba33f-06b0-425f-b157-6f50471c9c77",
+  "meta": {
+    "instanceId": "0395a475a0f442d35a7f12b96ba2de62d46012832a37abe99ca22c0ad74b2ddb"
+  },
+  "id": "IBgS89kaJT3PcXiG",
+  "tags": []
+}
