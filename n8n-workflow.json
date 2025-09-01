@@ -14,10 +14,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        -1296,
-        336
+        -272,
+        16
       ],
-      "id": "d822b0d4-31ff-4d13-a1e3-9f980f7ed8f6",
+      "id": "c8a342ee-654d-4d9a-bb76-3fe5ff5d1d12",
       "name": "Schedule Trigger"
     },
     {
@@ -27,10 +27,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -656,
-        336
+        368,
+        16
       ],
-      "id": "652e8073-3385-4c51-ae4d-cff7a455998b",
+      "id": "fe413e1b-09ed-4e4c-905f-6c74b0956ddf",
       "name": "Code"
     },
     {
@@ -48,29 +48,18 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        576,
-        272
+        1472,
+        -32
       ],
-      "id": "9b05c646-2cb7-4242-950f-aab1ef37d231",
+      "id": "70eea4b7-da7f-40e0-81d8-148b656d4acd",
       "name": "Send a text message",
-      "webhookId": "243c2162-84da-4d9d-8801-7c8386acf67a",
+      "webhookId": "d634e52f-a48e-4a89-81f5-2496784cb69b",
       "credentials": {
         "telegramApi": {
           "id": "FVq27FHx7JzttA3k",
           "name": "Telegram account"
         }
       }
-    },
-    {
-      "parameters": {},
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3.2,
-      "position": [
-        352,
-        192
-      ],
-      "id": "7c69eeb5-2937-4992-bd1c-f13407c72385",
-      "name": "Merge"
     },
     {
       "parameters": {
@@ -100,10 +89,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        160,
-        448
+        1184,
+        128
       ],
-      "id": "2f37a37c-3864-4c56-9d24-a7ee50f4f44f",
+      "id": "c6396fa1-a1f2-4958-817f-ea25d06cb6bc",
       "name": "If length < 4090"
     },
     {
@@ -128,10 +117,10 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        -464,
-        336
+        560,
+        16
       ],
-      "id": "4d50af9c-eb33-4c8b-bdfb-4e0914df786b",
+      "id": "f75966e0-ebcd-49f5-9371-925646ce73c7",
       "name": "Generate Insight",
       "credentials": {
         "googlePalmApi": {
@@ -162,10 +151,10 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        0,
-        176
+        1024,
+        -144
       ],
-      "id": "0db8d04a-315b-4e31-a354-aba615bd2bf4",
+      "id": "451fa4bd-8456-4004-8db9-f0154b868dee",
       "name": "Convert to HTML",
       "credentials": {
         "googlePalmApi": {
@@ -196,10 +185,10 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        416,
-        464
+        1440,
+        144
       ],
-      "id": "c35af6ca-9af6-4d14-a5d4-b6fdd2d04a74",
+      "id": "80f3b803-27d3-4a37-b617-38b9c99df9a9",
       "name": "Summarize",
       "credentials": {
         "googlePalmApi": {
@@ -217,10 +206,10 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -1104,
-        416
+        -80,
+        96
       ],
-      "id": "6614f0de-38c7-4871-956b-a4b7872e5cbb",
+      "id": "88e2a864-29a0-4d85-9b31-7bd9bc0d168f",
       "name": "Get Transactions",
       "credentials": {
         "postgres": {
@@ -288,10 +277,10 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        0,
-        0
+        1024,
+        -320
       ],
-      "id": "2efd0436-14de-4967-9f6a-3e66ba1d1ee0",
+      "id": "5fa4f68c-a5ee-4139-b191-81167871ebd5",
       "name": "Insert Insight",
       "credentials": {
         "postgres": {
@@ -328,10 +317,10 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -1104,
-        256
+        -80,
+        -64
       ],
-      "id": "ac2376b1-3bc7-461f-b47f-a51443b2b5ae",
+      "id": "66dd2bec-f717-4bb5-8d24-9ff118c9fb40",
       "name": "Get Last Insight",
       "alwaysOutputData": true,
       "credentials": {
@@ -346,10 +335,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        -880,
-        336
+        144,
+        16
       ],
-      "id": "bbf00151-b55b-46d4-9a5f-0ff43df1aa04",
+      "id": "bbfb4491-5d3c-40bb-ba91-58947e7cf6de",
       "name": "Merge1"
     },
     {
@@ -374,10 +363,10 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        -160,
-        448
+        864,
+        128
       ],
-      "id": "85b8d0ae-d83f-430f-b94f-3008de04ea90",
+      "id": "32864b27-215e-42db-b3f2-6200617e40b1",
       "name": "Convert to HTML (Telegram)",
       "credentials": {
         "googlePalmApi": {
@@ -396,12 +385,12 @@
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
       "position": [
-        576,
-        96
+        1472,
+        -208
       ],
-      "id": "649ebf04-5290-4d0a-894f-c5e3f4c97c11",
+      "id": "25308feb-ce3e-477a-90ab-48e335121b3a",
       "name": "Send email",
-      "webhookId": "23a0d813-c478-4153-a446-07ab4884ef47",
+      "webhookId": "532b1eb0-5705-4a79-a680-e23130036304",
       "credentials": {
         "smtp": {
           "id": "7STO0GX9WoSrS57s",
@@ -411,17 +400,17 @@
     },
     {
       "parameters": {
-        "content": "1. Setting PostgreSQL Connection\n2. Set Gemini API\n3. Set Telegram ChatId\n4. Set Email Credentials",
+        "content": "1. Setting SQL Connection\n2. Set Gemini API\n3. Set Telegram ChatId\n4. Set Email Credentials",
         "height": 128,
         "width": 224
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -704,
-        512
+        320,
+        192
       ],
       "typeVersion": 1,
-      "id": "37bffc9a-2a0a-4b1d-8710-99f2aa0e6dc4",
+      "id": "95034789-3b84-40e0-bde7-a4ade07d4c20",
       "name": "Sticky Note"
     }
   ],
@@ -454,29 +443,18 @@
         ]
       ]
     },
-    "Merge": {
+    "Send a text message": {
       "main": [
-        [
-          {
-            "node": "Send a text message",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Send email",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "If length < 4090": {
       "main": [
         [
           {
-            "node": "Merge",
+            "node": "Send a text message",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ],
         [
@@ -513,7 +491,7 @@
       "main": [
         [
           {
-            "node": "Merge",
+            "node": "Send email",
             "type": "main",
             "index": 0
           }
@@ -578,12 +556,15 @@
   },
   "active": false,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "timezone": "Asia/Jakarta",
+    "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "522ba33f-06b0-425f-b157-6f50471c9c77",
+  "versionId": "80055b32-4cf1-4b54-b340-f8b0faedca3f",
   "meta": {
+    "templateCredsSetupCompleted": true,
     "instanceId": "0395a475a0f442d35a7f12b96ba2de62d46012832a37abe99ca22c0ad74b2ddb"
   },
-  "id": "IBgS89kaJT3PcXiG",
+  "id": "d8LU3q61R9Q5jUNI",
   "tags": []
 }
